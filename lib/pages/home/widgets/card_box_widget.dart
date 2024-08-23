@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tic_tac_joe/bloc/home/home_bloc.dart';
+import 'package:tic_tac_joe/helpers/direction_helpers.dart';
+import 'package:tic_tac_joe/pages/home/widgets/triangle_widget.dart';
 import 'package:tic_tac_joe/pages/result/result_screen.dart';
 import 'package:tic_tac_joe/models/active_box_model.dart';
 
@@ -57,23 +59,25 @@ class CardBox extends StatelessWidget {
                                   );
                             },
                       splashColor: Theme.of(context).primaryColorLight,
-                      child: SizedBox(
-                        width: boxWidth,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: state.hasWinner &&
-                                    state.winnerBoxes!
-                                        .any((w) => w.column == c && w.row == r)
-                                ? Colors.green
-                                : null,
-                            border: Border(
-                              top: BorderSide.none,
-                              right: r == 3 ? BorderSide.none : borderSide,
-                              bottom: c == 3 ? BorderSide.none : borderSide,
-                              left: BorderSide.none,
+                      child: Stack(
+                        children: [
+                          Container(
+                            alignment: Alignment.topCenter,
+                            width: boxWidth,
+                            height: boxWidth,
+                            decoration: BoxDecoration(
+                              color: state.hasWinner &&
+                                      state.winnerBoxes!.any(
+                                          (w) => w.column == c && w.row == r)
+                                  ? Colors.greenAccent
+                                  : null,
+                              border: Border(
+                                top: BorderSide.none,
+                                right: r == 3 ? BorderSide.none : borderSide,
+                                bottom: c == 3 ? BorderSide.none : borderSide,
+                                left: BorderSide.none,
+                              ),
                             ),
-                          ),
-                          child: Center(
                             child: Text(
                               activeBoxes
                                       .where((a) => a.row == r && a.column == c)
@@ -83,11 +87,23 @@ class CardBox extends StatelessWidget {
                                       .toUpperCase() ??
                                   "",
                               style: TextStyle(
-                                fontSize: boxWidth - 8,
+                                fontSize: boxWidth / 1.5,
                               ),
                             ),
                           ),
-                        ),
+                          BlocBuilder<HomeBloc, HomeState>(
+                            builder: (context, state) {
+                              if (state.hasWinner &&
+                                  state.winnerBoxes!.any(
+                                      (w) => w.column == c && w.row == r)) {
+                                return _slashBox(
+                                    state.winnerBoxes!, c, r, boxWidth);
+                              } else {
+                                return Container();
+                              }
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -97,6 +113,17 @@ class CardBox extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _slashBox(
+      List<ActiveBox> winnerBoxes, int col, int row, double boxWidth) {
+    Direction? direction = getDirection(winnerBoxes, row, col);
+
+    return CustomBoxSlash(
+      width: boxWidth,
+      height: boxWidth,
+      direction: direction!,
     );
   }
 }

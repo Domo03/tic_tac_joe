@@ -19,6 +19,17 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(
             height: 24,
           ),
+          BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, state) {
+              return Text(
+                'Turn: Player ${state.activePlayer.name}',
+                style: Theme.of(context).textTheme.titleLarge,
+              );
+            },
+          ),
+          const SizedBox(
+            height: 24,
+          ),
           const CardBox(
             colNumber: 3,
             rowNumber: 3,
@@ -27,19 +38,12 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(
             height: 24,
           ),
-          BlocBuilder<HomeBloc, HomeState>(
-            builder: (context, state) {
-              if (state.hasWinner) {
-                return ElevatedButton.icon(
-                  icon: const Icon(Icons.replay_outlined),
-                  onPressed: () {
-                    context.read<HomeBloc>().add(ResetBox());
-                  },
-                  label: const Text('Play Again'),
-                );
-              }
-              return Container();
+          ElevatedButton.icon(
+            icon: const Icon(Icons.replay_outlined),
+            onPressed: () {
+              context.read<HomeBloc>().add(ResetBox());
             },
+            label: const Text('Play Again'),
           ),
         ],
       ),
